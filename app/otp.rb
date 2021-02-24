@@ -14,17 +14,19 @@ class App
   end
 
   def command_exec
-    if ARGV.length == 2
+    case ARGV.length
+    when 2
       otp_name = ARGV[0]
       parsed = parse_scheme(ARGV[1])
-      secret = parsed['secret'] || ARGV[1]
+      secret = parsed&.[]('secret') || ARGV[1]
       register_otp(secret, otp_name)
-    elsif ARGV.length == 1
-      generate_otp(ARGV[0])
-    elsif ARGV.length == 0
+    when 1
+      otp_name = ARGV[0]
+      generate_otp(otp_name)
+    when 0
       generate_all_otp
     else
-      puts "Bad Parameter"
+      puts 'Bad Parameter'
     end
   end
 
@@ -73,9 +75,9 @@ class App
     raise 'No Salt Data' if salt.nil?
     secret_data = @data[:secrets]
     raise 'No Secrets Data' if secret_data.nil?
-    secret_data.keys.each do |otp_name|
+    secret_data.each_key do |otp_name|
       generate_otp(otp_name)
-    rescue OpenSSL::Cipher::CipherError => e
+    rescue OpenSSL::Cipher::CipherError
       puts "password for #{otp_name}: "
       ask_password
       retry
@@ -88,20 +90,21 @@ class App
 
   def ask_password
     print 'password: '
-    @password = STDIN.noecho(&:gets).chomp
+    @password = $stdin.noecho(&:gets).chomp
     puts
     @password
   end
 
   def load
-    @data = if File.exist?(@filename)
-      YAML.load_file(@filename)
-    else
-      {
-        salt: Crypter.generate_salt,
-        secrets: {}
-      }
-    end
+    @data =
+      if File.exist?(@filename)
+        YAML.load_file(@filename)
+      else
+        {
+          salt: Crypter.generate_salt,
+          secrets: {},
+        }
+      end
   end
 
   def save
