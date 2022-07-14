@@ -1,11 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.7.0)
-      public_suffix (>= 2.0.2, < 5.0)
-    public_suffix (4.0.4)
-    rotp (6.0.0)
-      addressable (~> 2.7)
+    rotp (6.2.0)
 
 PLATFORMS
   ruby
@@ -14,4 +10,4 @@ DEPENDENCIES
   rotp
 
 BUNDLED WITH
-   2.1.4
+   2.3.17
